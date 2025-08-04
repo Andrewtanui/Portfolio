@@ -1,0 +1,13 @@
+/* App.css - Custom styles for Andrew Tanui Portfolio */
+
+/* Example: Add a fade-in animation for the main app */
+.app-fade-in {
+  animation: fadeIn 0.8s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* You can add more custom styles here as needed */
