@@ -1,5 +1,7 @@
-import { motion } from 'framer-motion'
-import { Github, Mail, Download, ExternalLink } from 'lucide-react'
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Github, Mail, Download, ExternalLink } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 
 const Contact = () => {
   const contactLinks = [
@@ -17,6 +19,42 @@ const Contact = () => {
     }
   ]
 
+
+  // EmailJS form state
+  const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setSuccess('');
+    setError('');
+    try {
+      await emailjs.send(
+        'service_rlgtjwa',
+        'template_slne9xg',
+        {
+          from_name: form.name,
+          from_email: form.email,
+          message: form.message,
+        },
+        'CDPq04qBmtiFXli31'
+      );
+      setSuccess('Message sent successfully!');
+      setForm({ name: '', email: '', message: '' });
+    } catch (err) {
+      setError('Failed to send message. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDownloadCV = () => {
     const link = document.createElement('a');
     link.href = '/Andrew Tanui CV.pdf';
@@ -24,7 +62,7 @@ const Contact = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }
+  };
 
   return (
     <section id="contact" className="section-padding bg-dark-900">
@@ -111,44 +149,59 @@ const Contact = () => {
               Ready to start a project? Fill out the form below and I'll get back to you as soon as possible.
             </p>
             
-            <div className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-sm font-medium text-dark-300 mb-2">
                   Name
                 </label>
                 <input
                   type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:border-primary-500 transition-colors duration-200"
                   placeholder="Your name"
+                  required
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-dark-300 mb-2">
                   Email
                 </label>
                 <input
                   type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:border-primary-500 transition-colors duration-200"
                   placeholder="your.email@example.com"
+                  required
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-dark-300 mb-2">
                   Message
                 </label>
                 <textarea
                   rows="4"
+                  name="message"
+                  value={form.message}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:border-primary-500 transition-colors duration-200 resize-none"
                   placeholder="Tell me about your project..."
+                  required
                 ></textarea>
               </div>
-              
-              <button className="w-full px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors duration-200">
-                Send Message
+              {success && <p className="text-green-400 text-sm">{success}</p>}
+              {error && <p className="text-red-400 text-sm">{error}</p>}
+              <button
+                type="submit"
+                className="w-full px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors duration-200"
+                disabled={loading}
+              >
+                {loading ? 'Sending...' : 'Send Message'}
               </button>
-            </div>
+            </form>
           </motion.div>
         </div>
 
